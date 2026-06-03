@@ -1,0 +1,27 @@
+WatuPROIntel={};WatuPROPractice={};WatuPROPractice.submit=function(){jQuery('#watuPracticeFeedback').show();jQuery('#watuPracticeFeedback').html("<p>"+watupro_i18n.please_wait_feedback+"</p>");jQuery('#questionDiv'+this.curID).hide();data={"id":this.curID,"answer":this.getAnswer(this.curID),"action":"watupro_practice_submit"};var self=this;jQuery.post(WatuPRO.siteURL,data,function(msg){var nextID=self.allIDs[0];var getNext=false;for(x in self.allIDs)
+{if(getNext)
+{nextID=self.allIDs[x];break;}
+if(self.allIDs[x]==self.curID)getNext=true;}
+self.curID=nextID;msg+="<p align='center'><input type='button' onclick=\"jQuery('#questionDiv"+self.curID+"').show();jQuery('#watuPracticeFeedback').hide();jQuery('#watuPROCheckButton').show();\" value='&gt;&gt;&gt;'></p>";jQuery('#watuPracticeFeedback').html(msg);jQuery('#watuPROCheckButton').hide();jQuery('#watuPROPracticeForm'+self.examID)[0].reset();if(typeof MathJax!='undefined')MathJax.Hub.Queue(["Typeset",MathJax.Hub,"watuPracticeFeedback"]);});}
+WatuPROPractice.getAnswer=function(questionID){var ansvalues=[];var ansgroup='.answerof-'+questionID;var answerType=jQuery('#answerType'+questionID).val();i=0;if(answerType=='textarea'){ansvalues[0]=jQuery('#textarea_q_'+questionID).val();}
+else{jQuery(ansgroup).each(function(){if(jQuery(this).is(':checked')||answerType=='gaps'||answerType=='sort'||answerType=='matrix'||answerType=='nmatrix'||answerType=='slider'){ansvalues[i]=this.value;i++;}});}
+return ansvalues;}
+WatuPRODep={};WatuPRODep.forceNumber=function(item)
+{if(isNaN(item.value)||item.value=="")item.value=0;}
+WatuPRODep.lockDetails=function(examID,adminURL)
+{adminURL=adminURL||"";tb_show("Taking Details",adminURL+"admin-ajax.php?action=watupro_lock_details&exam_id="+examID,"admin-ajax.php");}
+WatuPROSort={};WatuPROSort.sortable=function(event,ui){var id=jQuery(ui.item).parent().attr('id');var valID=id.replace('watuPROSortable','watuPROSortableValue');var positions=jQuery("#"+id).sortable('toArray');var sortedAnswers="";for(i=0;i<positions.length;i++){var parts=jQuery('#'+positions[i]).html().split("<!--|||");val=parts[1].substring(0,parts[1].length-3);sortedAnswers+=val+"|";}
+jQuery('#'+valID).val(sortedAnswers);}
+WatuPROPay={};WatuPROPay.payWithPoints=function(id,url,isBundle,redirectURL){isBundle=isBundle||0;redirectURL=redirectURL||'';data={"id":id,"is_bundle":isBundle};jQuery.post(url,data,function(msg){if(msg=='SUCCESS'){if(redirectURL)window.location=redirectURL;else{window.location=window.location+"?paid=1";window.location.reload();}}
+else alert(msg);});}
+WatuPROPay.payWithMoolaMojo=function(id,url,isBundle,redirectURL){isBundle=isBundle||0;redirectURL=redirectURL||'';data={"id":id,"is_bundle":isBundle};jQuery.post(url,data,function(msg){if(msg=='SUCCESS'){if(redirectURL)window.location=redirectURL;else{window.location=window.location+"?paid=1";window.location.reload();}}
+else alert(msg);});}
+WatuPROIDroppable={};WatuPROIDroppable.drop=function(event,ui){dropID=event.target.id;jQuery('#'+dropID).addClass('watupro-droppable-hover');var ansVal=ui.draggable[0].innerHTML;ansVal=ansVal.split('<!--WTPMD5');ansVal=ansVal[1].replace('-->','');jQuery('#field-'+dropID).val(ansVal);}
+WatuPROINMatrix={reservedNums:[],};WatuPROINMatrix.sel=function(elt,dropID,ansNum){var questionTable=jQuery('#'+dropID).closest('table');jQuery(questionTable).find('.watupro-nmatrix-answer-field').each(function(cnt,fld){if(fld.value!=''){var parentTD=jQuery(fld).parent();jQuery(parentTD).find('.watupro-matrix-draggable').each(function(dct,div){var ansVal=div.innerHTML;ansVal=ansVal.split('<!--WTPMD5');ansValParts=ansVal[1].split('-->');ansVal=ansValParts[0];if(ansVal==fld.value)jQuery(div).addClass('watupro-nmatrix-selected');});}});if(jQuery(elt).hasClass('watupro-nmatrix-selected')){jQuery(elt).removeClass('watupro-nmatrix-selected');this.reservedNums=this.reservedNums.filter(function(e){return e!==ansNum});var notClasses='';for(i=0;i<this.reservedNums.length;i++){notClasses+=':not(.watupro-nmatrix-answer-'+this.reservedNums[i]+')';}
+jQuery('#'+dropID+' div.question-choices div.watupro-matrix-right div.watupro-matrix-draggable:not(.watupro-nmatrix-selected)'+notClasses).show('slow');jQuery(questionTable).find('.watupro-nmatrix-answer-field').each(function(cnt,fld){if(fld.value==''){var parentTD=jQuery(fld).parent();jQuery(parentTD).find('.watupro-nmatrix-answer-'+ansNum).show();}
+jQuery(parentTD).find('.watupro-nmatrix-answer-'+ansNum).removeClass('watupro-nmatrix-hidden');});jQuery('#field-'+dropID).val('');return false;}
+var ansVal=elt.innerHTML;ansVal=ansVal.split('<!--WTPMD5');ansValParts=ansVal[1].split('-->');ansVal=ansValParts[0];jQuery('#field-'+dropID).val(ansVal);jQuery(elt).addClass('watupro-nmatrix-selected');jQuery('#'+dropID+' div.question-choices div.watupro-matrix-right div.watupro-matrix-draggable:not(.watupro-nmatrix-selected)').hide('slow');var table=jQuery('#'+dropID).closest('table');var tableID=jQuery(table).attr('id');jQuery('#'+tableID+' .watupro-nmatrix-answer-'+ansNum+':not(.watupro-nmatrix-selected)').hide('slow');this.reservedNums.push(ansNum);}
+WatuPROIntel.runTimeLogic=function(msg){if(msg=='continue'||msg=='')return true;if(msg=='end'){WatuPRO.forceSubmit=true;WatuPRO.premature_end=1;WatuPRO.submitResult();}
+if(msg=='stop'){alert(watupro_i18n.cant_continue_low_correct_percent);WatuPRO.nextQuestion(null,'previous');}
+return true;}
+WatuPROIntel.init=function(quizID){}
