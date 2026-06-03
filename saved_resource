@@ -1,0 +1,20 @@
+div.watu-question, div.show-question {
+margin-top: 15px !important;
+font-size: 18px!important;
+}
+.question-choices, .show-question-choices {
+margin-top: 10px !important;
+font-size: 17px !important;
+}
+p.watupro-qnum-info {
+padding-top:10px !important;
+}
+input.watupro-gap, select.watupro-gap {
+font-size: 10px !important;
+}
+.watupro-question-choice span {
+		  display: inline !important; /* added in WatuPRO 6.1.0.4 */
+		}
+@media 
+			only screen and (max-width: 600px) {
+}
